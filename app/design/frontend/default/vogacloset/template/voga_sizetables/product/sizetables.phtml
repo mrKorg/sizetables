@@ -1,0 +1,12 @@
+<?php $sizetables = $this->getCollection(); ?>
+
+<div id="sizeguide" class="std">
+    <h2 class="title-sm"><?php echo $this->__('Size guide'); ?>!</h2>
+    <p class="text"><?php echo $this->__('Please note that this table is meant to be used as a guide only.<br>Sizes may vary notably between different clothing manufacturers & brands.'); ?></p>
+    <?php if ($this->getSizatables()) : ?>
+        <?php foreach ( $sizetables as $item ) : ?>
+            <p class="title"><?php echo $item->getName(); ?></p>
+            <div class="table-wrapper"><?php echo $item->getTable(); ?></div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>

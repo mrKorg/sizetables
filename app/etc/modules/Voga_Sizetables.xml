@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Voga_Sizetables>
+            <active>true</active>
+            <codePool>local</codePool>
+            <depends>
+                <RonisBT_AdminForms/>
+            </depends>
+        </Voga_Sizetables>
+    </modules>
+</config>

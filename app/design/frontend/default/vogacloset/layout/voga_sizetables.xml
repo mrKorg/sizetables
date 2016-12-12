@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<layout>
+    <sizetables_index_index>
+        <reference name="content">
+            <block type="voga_sizetables/catalog_product_view_sizetables" template="voga_sizetables/sizetables.phtml" />
+        </reference>
+    </sizetables_index_index>
+    <catalog_product_view>
+        <reference name="product.info">
+            <block type="core/template" name="sizeguide.popup" template="page/html/popup.phtml">
+                <action method="setPopupId"><id>SizeGuidePopup</id></action>
+                <block type="voga_sizetables/catalog_product_view_sizetables" name="sizetables" template="voga_sizetables/product/sizetables.phtml" />
+            </block>
+        </reference>
+    </catalog_product_view>
+</layout>

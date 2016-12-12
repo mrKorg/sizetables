@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<config>
+    <menu>
+        <cms>
+            <children>
+                <sizetables>
+                    <title>Size Tables</title>
+                    <action>adminforms/adminhtml_block/index/block_key/voga_sizetables/</action>
+                </sizetables>
+            </children>
+        </cms>
+    </menu>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <cms>
+                        <children>
+                            <sizetables>
+                                <title>Size Tables</title>
+                            </sizetables>
+                        </children>
+                    </cms>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

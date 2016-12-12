@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<adminforms>
+    <entities>
+        <voga_sizetables>
+            <groups>
+                <general>
+                    <name>General</name>
+                    <attributes>
+                        <name>
+                            <template>text</template>
+                        </name>
+                        <status>
+                            <template>status</template>
+                        </status>
+                        <position>
+                            <template>text</template>
+                            <type>int</type>
+                        </position>
+                        <table>
+                            <template>wtextarea</template>
+                        </table>
+                    </attributes>
+                </general>
+            </groups>
+            <grid>
+                <fields>
+                    <name>
+                        <width>60%</width>
+                    </name>
+                    <status><width>5%</width></status>
+                    <position><width>5%</width></position>
+                </fields>
+            </grid>
+        </voga_sizetables>
+    </entities>
+</adminforms>

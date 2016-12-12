@@ -1,0 +1,5 @@
+<?php
+class Voga_Sizetables_Block_Adminhtml_Sizetables_Grid extends RonisBT_AdminForms_Block_Adminhtml_Block_Grid_Standard
+{
+
+}
