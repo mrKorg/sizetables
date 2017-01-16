@@ -2,22 +2,31 @@
 
 class Voga_Sizetables_Block_Catalog_Product_View_Sizetables extends Mage_Core_Block_Template
 {
-    public $womanId = 3;
-    public $manId = 4;
-    public $kidsId = 5;
+    protected $_womanId = 'voga_sizetables/sizetables/womens_category';
+    protected $_manId = 'voga_sizetables/sizetables/mens_category';
+    protected $_kidsId = 'voga_sizetables/sizetables/kids_category';
 
     /**
      * @return mixed
      */
-    public function getCollection(){
-        if (is_null($this->_collection)){
+    protected function _getCollection()
+    {
+        if (is_null($this->_collection)) {
+
             $this->_collection = Mage::getModel('adminforms/block',array('entity_type'=>'voga_sizetables'))->getCollection()
                 ->addAttributeToSelect('*')
                 ->addAttributeToFilter('status', RonisBT_AdminForms_Model_Config_Source_Status::STATUS_ENABLED)
                 ->setOrder('position', 'ASC')
             ;
             if ($this->getProduct()) {
-                $this->_collection->addAttributeToFilter('entity_id', $this->getSizatables());
+                $this->_collection
+                    ->getSelect()
+                    ->joinLeft(
+                        array('sizetables'=> $this->_collection->getTable('voga_sizetables/table_sizetables')), 'sizetables.sizetable_id=e.entity_id',
+                        array('entity_sizetable_id' => 'sizetables.entity_id'))
+                    ->where('sizetables.category_id IN (?)', $this->_getProductCategories())
+                    ->group('sizetables.sizetable_id')
+                ;
             }
         }
         return $this->_collection;
@@ -35,91 +44,90 @@ class Voga_Sizetables_Block_Catalog_Product_View_Sizetables extends Mage_Core_Bl
     protected function _getProductCategories()
     {
         if (is_null($this->_categories)) {
-            $this->_categories = $this->getProduct()->getCategoryIds();
+            $productCategories = $this->getProduct()->getCategoryIds();
+            $allProductCategories = [];
+            foreach ($productCategories as $categoryId) {
+                $allProductCategories[] = $categoryId;
+                $category = Mage::getModel('catalog/category')->load($categoryId);
+                foreach ($category->getParentCategories() as $parent) {
+                    $allProductCategories[] = $parent->getId();
+                }
+            }
         }
-        return $this->_categories;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getSizatables()
-    {
-        return Mage::getModel('voga_sizetables/sizetables')->getCategorySizetablesArray( $this->_getProductCategories()[0] );
+        return array_unique($allProductCategories);
     }
 
     /**
      * Return parent category second level
      * @return mixed
      */
-    public function _getParentCategories($categoryIds)
+    protected function _getParentCategories($categoryIds)
     {
-        $parentCategoriesIds = array();
-
-        foreach ($categoryIds as $categoryId) {
-            $level = Mage::getModel('catalog/category')->load($categoryId)->getLevel();
-            while ($level > 2) {
-                $categoryId = Mage::getModel('catalog/category')->load($categoryId)->getParentId();
-                $level = Mage::getModel('catalog/category')->load($categoryId)->getLevel();
+        $parentCategoriesIds = [];
+        $categoryCollection = Mage::getModel('catalog/category')
+            ->getCollection()
+            ->addAttributeToSelect('entity_id')
+            ->addAttributeToSelect('path')
+            ->addAttributeToFilter('entity_id', $categoryIds);
+        $test = [];
+        foreach ($categoryCollection as $category) {
+            $categoryId = explode('/', $category->getPath())[2];
+            if ( !in_array($categoryId, $parentCategoriesIds) ) {
+                $parentCategoriesIds[] = $categoryId;
             }
-            $parentCategoriesIds[] = $categoryId;
         }
-
-        $parentCategoriesIds = array_unique($parentCategoriesIds);
-
-        return $parentCategoriesIds;
+        return $test;
     }
 
     /**
      * @param $parent
      * @return bool
      */
-    public function getCollectionByParent($parent)
+    public function getSizetablesCollection()
     {
-        $collection = $this->getCollection();
-        $womanTables = array();
-        $manTables = array();
-        $kidsTables = array();
+        $collection = $this->_getCollection();
+        $sizetablesCollection = new Varien_Data_Collection();
 
         foreach ($collection as $item) {
             $sizetablesCategoriesIds = Mage::getModel('voga_sizetables/sizetables')->getSizetablesCategoriesIds($item->getEntityId());
             $parentCategoriesIds = $this->_getParentCategories($sizetablesCategoriesIds);
             foreach ($parentCategoriesIds as $parentId) {
                 switch ($parentId) {
-                    case $this->womanId:
-                        $womanTables[] = $item->getEntityId();
+                    case Mage::getStoreConfig($this->_womanId):
+                        $item->setParent(Mage::getStoreConfig($this->_womanId));
                         break;
-                    case $this->manId:
-                        $manTables[]   = $item->getEntityId();
+                    case Mage::getStoreConfig($this->_manId):
+                        $item->setParent(Mage::getStoreConfig($this->_manId));
                         break;
-                    case $this->kidsId:
-                        $kidsTables[]  = $item->getEntityId();
+                    case Mage::getStoreConfig($this->_kidsId):
+                        $item->setParent(Mage::getStoreConfig($this->_kidsId));
                         break;
                 }
             }
+            $sizetablesCollection->addItem($item);
         }
+        return $sizetablesCollection;
+    }
 
-        if ($parent == $this->womanId && $womanTables) {
-            return Mage::getModel('adminforms/block',array('entity_type'=>'voga_sizetables'))->getCollection()
-                ->addAttributeToSelect('*')
-                ->addAttributeToFilter('status', RonisBT_AdminForms_Model_Config_Source_Status::STATUS_ENABLED)
-                ->addAttributeToFilter('entity_id', $womanTables)
-                ->setOrder('position', 'ASC');
-        } else if ($parent == $this->manId && $manTables) {
-            return Mage::getModel('adminforms/block',array('entity_type'=>'voga_sizetables'))->getCollection()
-                ->addAttributeToSelect('*')
-                ->addAttributeToFilter('status', RonisBT_AdminForms_Model_Config_Source_Status::STATUS_ENABLED)
-                ->addAttributeToFilter('entity_id', $manTables)
-                ->setOrder('position', 'ASC');
-        } else if ($parent == $this->kidsId && $kidsTables) {
-            return Mage::getModel('adminforms/block',array('entity_type'=>'voga_sizetables'))->getCollection()
-                ->addAttributeToSelect('*')
-                ->addAttributeToFilter('status', RonisBT_AdminForms_Model_Config_Source_Status::STATUS_ENABLED)
-                ->addAttributeToFilter('entity_id', $kidsTables)
-                ->setOrder('position', 'ASC');
-        }
+    protected function _isWoman()
+    {
+        foreach ($this->getSizetablesCollection() as $item)
+            if ($item->getParent() == Mage::getStoreConfig($this->_womanId)) return true;
         return false;
     }
 
+    protected function _isMan()
+    {
+        foreach ($this->getSizetablesCollection() as $item)
+            if ($item->getParent() == Mage::getStoreConfig($this->_manId)) return true;
+        return false;
+    }
+
+    protected function _isKids()
+    {
+        foreach ($this->getSizetablesCollection() as $item)
+            if ($item->getParent() == Mage::getStoreConfig($this->_kidsId)) return true;
+        return false;
+    }
 
 }

@@ -1,9 +1,9 @@
-<?php $sizetables = $this->getCollection(); ?>
+<?php $sizetables = $this->_getCollection(); ?>
 
 <div id="sizeguide" class="std">
     <h2 class="title-sm"><?php echo $this->__('Size guide'); ?>!</h2>
     <p class="text"><?php echo $this->__('Please note that this table is meant to be used as a guide only.<br>Sizes may vary notably between different clothing manufacturers & brands.'); ?></p>
-    <?php if ($this->getSizatables()) : ?>
+    <?php if ($sizetables) : ?>
         <?php foreach ( $sizetables as $item ) : ?>
             <p class="title"><?php echo $item->getName(); ?></p>
             <div class="table-wrapper"><?php echo $item->getTable(); ?></div>

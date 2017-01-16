@@ -3,10 +3,10 @@
     <menu>
         <cms>
             <children>
-                <sizetables>
+                <voga_sizetables>
                     <title>Size Tables</title>
                     <action>adminforms/adminhtml_block/index/block_key/voga_sizetables/</action>
-                </sizetables>
+                </voga_sizetables>
             </children>
         </cms>
     </menu>
@@ -16,11 +16,22 @@
                 <children>
                     <cms>
                         <children>
-                            <sizetables>
+                            <voga_sizetables>
                                 <title>Size Tables</title>
-                            </sizetables>
+                            </voga_sizetables>
                         </children>
                     </cms>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <voga_sizetables>
+                                        <title>Size Tables</title>
+                                    </voga_sizetables>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
                 </children>
             </admin>
         </resources>
